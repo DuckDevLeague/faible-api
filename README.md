@@ -1,4 +1,5 @@
 # Faible API
+API for the FAIble App
 
 ```bash
 # Install the dependencies
