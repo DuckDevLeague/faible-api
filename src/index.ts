@@ -1,10 +1,9 @@
 import express from "express";
+import { router } from "./routes";
 
 const app = express();
 
-app.get('/', (req, res) => {
-  res.send('Hello world');
-});
+app.use(router);
 
 app.listen(3333, () => {
   console.log("Server is Running!");
