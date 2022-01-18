@@ -5,25 +5,41 @@ import app from '../services/firebaseService';
 const db = getFirestore(app);
 
 export const getHome = async (req: Request, res: Response) => {
-  const storiesRef = db.collection('stories').orderBy('popularity', 'desc').limit(10);
-  const stories = await storiesRef.get();
-  const returnStories = []
+  const storiesRefPopular = db.collection('stories').orderBy('popularity', 'desc').limit(10);
+  const storiesRefRecent = db.collection('stories').orderBy('createdAt', 'desc').limit(5);
+  const storiesPopular = await storiesRefPopular.get();
+  const storiesRecent = await storiesRefRecent.get();
+  const returnStoriesPopular = []
+  const returnStoriesRecent = []
 
-  if (stories.empty) {
+  if (storiesPopular.empty || storiesRecent.empty) {
     console.log('No matching documents.');
     res.status(404).json({});
   }
 
-  stories.forEach((doc) => {
-    returnStories.push({
+  storiesPopular.forEach((doc) => {
+    returnStoriesPopular.push({
       author: doc.data().author,
       description: doc.data().description,
       title: doc.data().title,
+      bannerImage: doc.data().bannerImage,
       id: doc.id
     })
-  })
+  });
 
-  res.status(200).json(returnStories);
+  storiesRecent.forEach((doc) => {
+    returnStoriesRecent.push({
+      author: doc.data().author,
+      title: doc.data().title,
+      bannerImage: doc.data().bannerImage,
+      id: doc.id
+    })
+  });
+
+  res.status(200).json({
+    new: returnStoriesRecent,
+    popular: returnStoriesPopular,
+  });
 }
 
 export const getStoryById = async (req: Request, res: Response) => {
