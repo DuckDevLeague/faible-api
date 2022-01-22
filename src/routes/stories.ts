@@ -57,3 +57,27 @@ export const getStoryById = async (req: Request, res: Response) => {
 
   return res.status(404).json({});
 }
+
+export const searchStories = async (req: Request, res: Response) => {
+  const { genre } = req.params;
+  const storiesRef = db.collection('stories').where("genres", "array-contains", genre)
+  const stories = await storiesRef.get();
+  const finalStories = []
+
+  if (stories.empty) {
+    console.log('No matching documents.');
+    res.status(404).json({});
+  }
+
+  stories.forEach((doc) => {
+    finalStories.push({
+      author: doc.data().author,
+      title: doc.data().title,
+      bannerImage: doc.data().bannerImage,
+      id: doc.id
+    })
+  })
+
+  return res.status(200).json(finalStories);
+
+}
