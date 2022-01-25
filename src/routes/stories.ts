@@ -59,8 +59,16 @@ export const getStoryById = async (req: Request, res: Response) => {
 }
 
 export const searchStories = async (req: Request, res: Response) => {
-  const { genre } = req.params;
-  const storiesRef = db.collection('stories').where("genres", "array-contains", genre)
+  const { param } = req.params;
+
+  let storiesRef = null;
+  const storyGenres = ['Fantasy', 'Comedy', 'Adventure'];
+  if (storyGenres.includes(param)) {
+    storiesRef = db.collection('stories').where("genres", "array-contains", param);
+  } else {
+    storiesRef = db.collection('stories').where("title", "==", param);
+  }
+
   const stories = await storiesRef.get();
   const finalStories = []
 
