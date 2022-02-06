@@ -5,10 +5,21 @@ import app from '../services/firebaseService';
 const db = getFirestore(app);
 
 export const getHome = async (req: Request, res: Response) => {
-  const storiesRefPopular = db.collection('stories').orderBy('popularity', 'desc').limit(10);
-  const storiesRefRecent = db.collection('stories').orderBy('createdAt', 'desc').limit(5);
-  const storiesPopular = await storiesRefPopular.get();
-  const storiesRecent = await storiesRefRecent.get();
+  let storiesPopular = null;
+  let storiesRecent = null;
+
+  if (req.query['adultContent'] === 'false') {
+    const storiesRefPopular = db.collection('stories').orderBy('popularity', 'desc').limit(10);
+    const storiesRefRecent = db.collection('stories').orderBy('createdAt', 'desc').limit(5);
+    storiesPopular = await storiesRefPopular.get();
+    storiesRecent = await storiesRefRecent.get();
+  } else {
+    const storiesRefPopular = db.collection('stories');
+    const storiesRefRecent = db.collection('stories');
+    storiesPopular = await storiesRefPopular.where('adultContent', '==', false).limit(10).get();
+    storiesRecent = await storiesRefRecent.where('adultContent', '==', false).limit(5).get();
+  }
+
   const returnStoriesPopular = []
   const returnStoriesRecent = []
 
@@ -60,7 +71,7 @@ export const getStoryById = async (req: Request, res: Response) => {
 
 export const searchStories = async (req: Request, res: Response) => {
   const { param } = req.params;
-
+  console.log('aa');
   let storiesRef = null;
   const storyGenres = ['Fantasia', 'Comédia', 'Aventura'];
   if (storyGenres.includes(param)) {
