@@ -71,9 +71,8 @@ export const getStoryById = async (req: Request, res: Response) => {
 
 export const searchStories = async (req: Request, res: Response) => {
   const { param } = req.params;
-  console.log('aa');
   let storiesRef = null;
-  const storyGenres = ['Fantasia', 'Comédia', 'Aventura'];
+  const storyGenres = ['Fantasia', 'Comédia', 'Aventura', 'Suspense', 'Ficção'];
   if (storyGenres.includes(param)) {
     storiesRef = db.collection('stories').where("genres", "array-contains", param);
   } else {
